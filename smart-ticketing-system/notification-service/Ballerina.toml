@@ -1,0 +1,19 @@
+[package]
+org = "smart_ticketing"
+name = "notification_service"
+version = "0.1.0"
+
+[[platform.java17.dependency]]
+groupId = "org.ballerinalang"
+artifactId = "ballerina-http"
+version = "2.8.0"
+
+[[platform.java17.dependency]]
+groupId = "org.ballerinalang"
+artifactId = "ballerina-mongo"
+version = "1.8.0"
+
+[[platform.java17.dependency]]
+groupId = "org.ballerinalang"
+artifactId = "ballerina-kafka"
+version = "4.8.0"

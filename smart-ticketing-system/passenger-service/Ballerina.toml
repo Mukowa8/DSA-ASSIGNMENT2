@@ -1,0 +1,19 @@
+[package]
+org = "smart_ticketing"
+name = "passenger_service"
+version = "0.1.0"
+
+[[platform.java17.dependency]]
+groupId = "io.ballerina.stdlib"
+artifactId = "http"
+version = "2.10.0"
+
+[[platform.java17.dependency]]
+groupId = "io.ballerina.stdlib"
+artifactId = "mongodb"
+version = "1.10.0"
+
+[[platform.java17.dependency]]
+groupId = "io.ballerina.stdlib"
+artifactId = "kafka"
+version = "4.6.0"

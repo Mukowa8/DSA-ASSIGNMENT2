@@ -1,0 +1,110 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-setup:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka
+    volumes:
+      - ./kafka/setup-topics.sh:/setup-topics.sh
+    command: ["/bin/sh", "/setup-topics.sh"]
+    
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: ticketing
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  passenger-service:
+    build: ./passenger-service
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+  transport-service:
+    build: ./transport-service
+    ports:
+      - "8081:8081"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+  ticketing-service:
+    build: ./ticketing-service
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+  admin-service:
+    build: ./admin-service
+    ports:
+      - "8085:8085"
+    environment:
+      KAFKA_BROKER: kafka:29092
+      MONGODB_URI: mongodb://admin:password@mongodb:27017
+    depends_on:
+      - kafka
+      - mongodb
+
+volumes:
+  mongodb_data:
